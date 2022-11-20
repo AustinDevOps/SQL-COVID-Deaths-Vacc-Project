@@ -1,0 +1,121 @@
+Select *
+From CovidDeaths
+Order By 3, 4
+
+-- Filter vital fields
+
+Select Location, Date, Total_cases, New_cases, Total_deaths, Population
+From CovidDeaths
+Order By 1, 2
+
+-- Comparing the Total Covid cases to total deaths. that is, how many deaths are recorded
+-- over the cases. what is the percentage of the people who died from the entire cases of covid
+
+Select Location, Date, Total_cases, Total_deaths, (Total_deaths/Total_cases)*100 As PercentageDeath
+From CovidDeaths
+Order By 1, 2
+
+
+-- Nigeria Covid19 case study
+
+-- the percentages shows the likelihood of dying if you contract covid.
+
+Select Location, Date, Total_cases, Total_deaths, (Total_deaths/Total_cases)*100 As PercentageDeath
+From CovidDeaths
+Where Location Like '%Nigeria%'
+Order By 1, 2
+
+--using United States as case study
+
+Select Location, Date, Total_cases, Total_deaths, (Total_deaths/Total_cases)*100 As PercentageDeath
+From CovidDeaths
+Where Location Like '%States%'
+Order By 1, 2
+
+
+--using the US case to see the total cases against population. that is, to show the percentage of 
+--population that got covid in the United States.
+
+Select Location, Date, Population, Total_cases, (Total_cases/Population)*100 As CovidPopulation_US
+From CovidDeaths
+Where Location Like '%States%'
+Order By 1, 2
+
+--Global population with covid-19
+
+Select Location, Date, Population, Total_cases, (Total_cases/Population)*100 As CovidPopulation
+From CovidDeaths
+--Where Location Like '%States%'
+Order By 1, 2
+
+Select Location, Population, Date, Max(Total_cases) HighestCovidCount
+, Max((Total_cases/Population))*100 As CovidPopulation
+From CovidDeaths
+--Where Location Like '%States%'
+Group By Location, Population, Date
+Order By CovidPopulation Desc
+
+--Countries with highest infection rate compared compared to population
+
+Select Location, Population, Max(Total_cases) InfectionCount
+, Max((Total_cases/Population))*100 As InfectionRate
+From CovidDeaths
+--Where Location Like '%States%'
+Group By Location, Population
+Order By InfectionRate desc
+
+
+--Countries with the Highest Death Rate/count
+
+Select Location, Max(Cast(Total_Deaths As Int)) TotalDeaths
+From CovidDeaths
+--Where Location Like '%States%'
+Where Continent Is Not Null
+Group By Location
+Order By TotalDeaths desc
+
+
+-- GLOBAL DEATH COUNT BY CONTINENT. Continents with the highest death count
+
+Select Distinct(Continent)
+From CovidDeaths
+
+Select Continent, Max(Cast(Total_Deaths As Int)) TotalDeaths
+From CovidDeaths
+Where Continent Is Not Null
+Group By Continent
+Order By TotalDeaths desc
+
+
+-- AVERAGE COVID DEATH BY CONTINENT
+Select Continent, Avg(Cast(Total_Deaths As Int)) AvgDeaths
+From CovidDeaths
+Where Continent Is Not Null
+Group By Continent
+Order By AvgDeaths desc
+
+
+--GLOBAL DEATH BY WHOLE WORLD.
+
+Select Sum(New_cases) TotalCases, Sum(Cast(New_Deaths As Int)) TotalDeaths, 
+	Sum(Cast(New_Deaths As Int))/Sum(New_cases)*100 GlobalDeathRate
+From CovidDeaths
+Where continent is not null
+--Group By date
+Order By 1, 2
+
+
+--Extract information about covid vaccination, by finding out the total population that has been
+--vaccinated, globally.
+
+Select dea.date, dea.continent, dea.location, dea.population, vac.new_vaccinations
+From CovidDeaths dea
+Join CovidVaccinations vac
+	On dea.date = vac.date
+	And dea.location = vac.location
+Where dea.continent is not null
+Order by 3, 2, 1
+
+
+
+
